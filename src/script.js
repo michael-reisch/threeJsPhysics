@@ -7,6 +7,16 @@ import CANNON from 'cannon'
  * Debug
  */
 const gui = new dat.GUI()
+const debugObject = {}
+
+debugObject.createSphere = () => {
+  createSphere(Math.random() * 0.5, {
+    x: Math.random(-0.5) * 3,
+    y: 3,
+    z: Math.random(-0.5) * 3,
+  })
+}
+gui.add(debugObject, 'createSphere')
 
 /**
  * Base
@@ -149,17 +159,17 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
  * Utils
  */
 const objectsToUpdate = []
+const sphereGeometry = new THREE.SphereGeometry(1, 20, 20)
+const sphereMaterial = new THREE.MeshStandardMaterial({
+  metalness: 0.3,
+  roughness: 0.4,
+  envMap: environmentMapTexture,
+})
 
 const createSphere = (radius, position) => {
   // Three.js mesh
-  const mesh = new THREE.Mesh(
-    new THREE.SphereGeometry(radius, 20, 20),
-    new THREE.MeshStandardMaterial({
-      metalness: 0.3,
-      roughness: 0.4,
-      envMap: environmentMapTexture,
-    })
-  )
+  const mesh = new THREE.Mesh(sphereGeometry, sphereMaterial)
+  mesh.scale.set(radius, radius, radius)
   mesh.castShadow = true
   mesh.position.copy(position)
   scene.add(mesh)
