@@ -1,7 +1,7 @@
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import * as dat from 'lil-gui'
-import CANNON from 'cannon'
+import * as CANNON from 'cannon-es'
 
 /**
  * Debug
@@ -25,8 +25,19 @@ debugObject.createBox = () => {
   })
 }
 
+debugObject.reset = () => {
+  for (const object of objectsToUpdate) {
+    object.body.removeEventListener('collide', playHitSound)
+    world.removeBody(object.body)
+    objectsToUpdate.splice(0, objectsToUpdate.length)
+
+    scene.remove(object.mesh)
+  }
+}
+
 gui.add(debugObject, 'createSphere')
 gui.add(debugObject, 'createBox')
+gui.add(debugObject, 'reset')
 
 /**
  * Base
@@ -85,7 +96,7 @@ const defaultContactMaterial = new CANNON.ContactMaterial(
   defaultMaterial,
   {
     friction: 0.9,
-    restitution: 0.9,
+    restitution: 0.3,
   }
 )
 world.addContactMaterial(defaultContactMaterial)
@@ -213,6 +224,8 @@ const createSphere = (radius, position) => {
     material: defaultMaterial,
   })
   body.position.copy(position)
+  body.addEventListener('collide', playHitSound)
+
   world.addBody(body)
 
   // Save in objects to update
